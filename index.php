@@ -27,7 +27,8 @@ if (isset($_POST['tambah_pasien_baru'])) {
         $pesan_status = "Pasien lama terdeteksi otomatis. ";
     } else {
         // Masukkan data master pasien baru
-        $query_pasien = "INSERT INTO pasien (nama_lengkap, tanggal_lahir, gender, alamat, riwayat_penyakit) VALUES ('$nama', '$tgl_lahir', '$gender', '$alamat', '$riwayat')";
+        // INSERT hanya ke kolom yang ada di tabel pasien (no_rm & password tidak ada di DB saat ini)
+        $query_pasien = "INSERT INTO pasien (nama_lengkap, tanggal_lahir, gender, alamat, no_hp, riwayat_penyakit) VALUES ('$nama', '$tgl_lahir', '$gender', '$alamat', '', '$riwayat')";
         mysqli_query($koneksi, $query_pasien);
         $id_pasien_fix = mysqli_insert_id($koneksi);
         $pesan_status = "Pendaftaran pasien baru sukses. ";

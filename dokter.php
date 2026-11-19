@@ -10,38 +10,6 @@ if (isset($_GET['search'])) {
     $search_keyword = mysqli_real_escape_string($koneksi, $_GET['search']);
 }
 
-// 🟡 AKSI 1: PENDAFTARAN INSTAN (BYPASS) ATAU MEMASUKKAN PASIEN LAMA KE ANTREAN HARI INI
-if (isset($_POST['daftar_bypass'])) {
-    $nama_bypass = mysqli_real_escape_string($koneksi, $_POST['nama_bypass']);
-    $tgl_lahir_bypass = mysqli_real_escape_string($koneksi, $_POST['tgl_lahir_bypass']);
-    $keluhan_bypass = mysqli_real_escape_string($koneksi, $_POST['keluhan_bypass']);
-
-    // Cek apakah pasien sudah ada di database
-    $cek_pasien_lama = mysqli_query($koneksi, "SELECT id_pasien FROM pasien WHERE nama_lengkap = '$nama_bypass' AND tanggal_lahir = '$tgl_lahir_bypass'");
-    
-    if (mysqli_num_rows($cek_pasien_lama) > 0) {
-        $data_p = mysqli_fetch_assoc($cek_pasien_lama);
-        $id_pasien_fix = $data_p['id_pasien'];
-    } else {
-        $query_pasien_baru = "INSERT INTO pasien (nama_lengkap, tanggal_lahir, gender, alamat, riwayat_penyakit) VALUES ('$nama_bypass', '$tgl_lahir_bypass', '-', '-', '-')";
-        mysqli_query($koneksi, $query_pasien_baru);
-        $id_pasien_fix = mysqli_insert_id($koneksi);
-    }
-
-    $tanggal_hari_ini = date('Y-m-d');
-    
-    // Cek dulu apakah pasien ini sudah masuk antrean hari ini agar tidak duplikat antrean
-    $cek_antrean_hari_ini = mysqli_query($koneksi, "SELECT id_kunjungan FROM kunjungan WHERE id_pasien = '$id_pasien_fix' AND tanggal_kunjungan = '$tanggal_hari_ini' AND status_antrean != 'Selesai'");
-    
-    if (mysqli_num_rows($cek_antrean_hari_ini) == 0) {
-        $query_antrean = "INSERT INTO kunjungan (id_pasien, tanggal_kunjungan, keluhan, status_antrean) VALUES ('$id_pasien_fix', '$tanggal_hari_ini', '$keluhan_bypass', 'Menunggu')";
-        if (mysqli_query($koneksi, $query_antrean)) {
-            $pesan = "Pasien berhasil didaftarkan langsung ke dalam antrean!";
-        }
-    } else {
-        $pesan = "⚠️ Pasien ini sudah berada di dalam antrean hari ini!";
-    }
-}
 
 // 🔵 AKSI 2: MASUKKAN PASIEN DARI DAFTAR MASTER LANGSUNG KE ANTREAN (KLIK DARI HASIL SEARCH)
 if (isset($_GET['aksi']) && $_GET['aksi'] == 'antreskan') {
@@ -217,16 +185,6 @@ $master_pasien = mysqli_query($koneksi, $query_master_pasien);
             </table>
         </div>
 
-        <!-- BOX 3: BYPASS FORM MANUAL (UNTUK PASIEN BARU VIA CHAT/TELP) -->
-        <div class="box" style="background: #fff3cd; border: 1px solid #ffeeba;">
-            <h4 style="margin: 0 0 8px 0; color: #856404;">➕ Tambah Pasien Baru Via Chat/Telp</h4>
-            <form action="dokter.php" method="POST">
-                <input type="text" name="nama_bypass" placeholder="Nama Lengkap" required style="width:100%; padding:5px; margin-bottom:5px; box-sizing:border-box;">
-                <input type="date" name="tgl_lahir_bypass" required style="width:100%; padding:5px; margin-bottom:5px; box-sizing:border-box;">
-                <input type="text" name="keluhan_bypass" placeholder="Keluhan / Catatan Hubungi" required style="width:100%; padding:5px; margin-bottom:8px; box-sizing:border-box;">
-                <button type="submit" name="daftar_bypass" style="width:100%; background:#ffc107; border:none; padding:6px; font-weight:bold; cursor:pointer; border-radius:4px; font-size:12px;">Daftarkan Ke Antrean</button>
-            </form>
-        </div>
 
     </div>
 
