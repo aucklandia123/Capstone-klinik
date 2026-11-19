@@ -2,6 +2,15 @@
 session_start();
 include 'koneksi.php';
 
+// Menangani URL jika ada akhiran path agar tidak terkunci (contoh: dashboard_admin.php/index.php)
+if (!empty($_SERVER['PATH_INFO'])) {
+    $target = trim($_SERVER['PATH_INFO'], '/');
+    if (file_exists(__DIR__ . '/' . $target)) {
+        header("Location: /Capstone-klinik/" . $target);
+        exit;
+    }
+}
+
 // ============================================================
 // PROTEKSI HALAMAN: Hanya bisa diakses jika sudah login
 // Session yang digunakan disesuaikan dengan sistem login yang ada.
@@ -117,6 +126,7 @@ $js_data   = json_encode($hari_data);
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <base href="/Capstone-klinik/">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Klinik - Klinik Sehat Pratama</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
