@@ -1,5 +1,6 @@
 <?php
 include 'koneksi.php';
+include 'helper_antrean.php';
 
 $pesan = "";
 
@@ -36,12 +37,13 @@ if (isset($_POST['tambah_pasien_baru'])) {
 
     // 2. Masukkan ke antrean kunjungan hari ini
     $tanggal_hari_ini = date('Y-m-d');
-    $cek_antrean = mysqli_query($koneksi, "SELECT id_kunjungan FROM kunjungan WHERE id_pasien = '$id_pasien_fix' AND tanggal_kunjungan = '$tanggal_hari_ini' AND status_antrean != 'Selesai'");
+    $cek_antrean = mysqli_query($koneksi, "SELECT id_kunjungan FROM kunjungan WHERE id_pasien = '$id_pasien_fix' AND tanggal_kunjungan = '$tanggal_hari_ini' AND status_antrean NOT IN ('Selesai','Batal')");
     
     if (mysqli_num_rows($cek_antrean) == 0) {
-        $query_antrean = "INSERT INTO kunjungan (id_pasien, tanggal_kunjungan, keluhan, status_antrean) VALUES ('$id_pasien_fix', '$tanggal_hari_ini', '$keluhan', 'Menunggu')";
+        $nomor_baru = generate_nomor_antrean($koneksi, 'Poli Umum', $tanggal_hari_ini);
+        $query_antrean = "INSERT INTO kunjungan (id_pasien, nomor_antrean, poli_tujuan, loket_meja, tanggal_kunjungan, keluhan, status_antrean) VALUES ('$id_pasien_fix', '$nomor_baru', 'Poli Umum', 'Ruang Poli Umum - Meja 1', '$tanggal_hari_ini', '$keluhan', 'Menunggu')";
         if (mysqli_query($koneksi, $query_antrean)) {
-            $pesan = $pesan_status . "Pasien berhasil dimasukkan ke antrean dokter!";
+            $pesan = $pesan_status . "Pasien berhasil dimasukkan ke antrean dengan No: <strong>$nomor_baru</strong>!";
         }
     } else {
         $pesan = "⚠️ Pasien sudah terdaftar di antrean hari ini!";
@@ -54,12 +56,13 @@ if (isset($_POST['antreskan_pasien_lama'])) {
     $keluhan_lama = mysqli_real_escape_string($koneksi, $_POST['keluhan_lama']);
     $tanggal_hari_ini = date('Y-m-d');
 
-    $cek_antrean = mysqli_query($koneksi, "SELECT id_kunjungan FROM kunjungan WHERE id_pasien = '$id_pasien_lama' AND tanggal_kunjungan = '$tanggal_hari_ini' AND status_antrean != 'Selesai'");
+    $cek_antrean = mysqli_query($koneksi, "SELECT id_kunjungan FROM kunjungan WHERE id_pasien = '$id_pasien_lama' AND tanggal_kunjungan = '$tanggal_hari_ini' AND status_antrean NOT IN ('Selesai','Batal')");
 
     if (mysqli_num_rows($cek_antrean) == 0) {
-        $query_antrean = "INSERT INTO kunjungan (id_pasien, tanggal_kunjungan, keluhan, status_antrean) VALUES ('$id_pasien_lama', '$tanggal_hari_ini', '$keluhan_lama', 'Menunggu')";
+        $nomor_baru = generate_nomor_antrean($koneksi, 'Poli Umum', $tanggal_hari_ini);
+        $query_antrean = "INSERT INTO kunjungan (id_pasien, nomor_antrean, poli_tujuan, loket_meja, tanggal_kunjungan, keluhan, status_antrean) VALUES ('$id_pasien_lama', '$nomor_baru', 'Poli Umum', 'Ruang Poli Umum - Meja 1', '$tanggal_hari_ini', '$keluhan_lama', 'Menunggu')";
         if (mysqli_query($koneksi, $query_antrean)) {
-            $pesan = "Pasien lama berhasil dimasukkan kembali ke antrean hari ini!";
+            $pesan = "Pasien lama berhasil dimasukkan kembali ke antrean hari ini dengan No: <strong>$nomor_baru</strong>!";
         }
     } else {
         $pesan = "⚠️ Pasien lama ini sudah berada di antrean hari ini!";
@@ -67,7 +70,7 @@ if (isset($_POST['antreskan_pasien_lama'])) {
 }
 
 // 📊 QUERY 1: TAMPILKAN DAFTAR ANTREAN HARI INI (Agar Admin bisa memantau kepadatan klinik)
-$daftar_antrean = mysqli_query($koneksi, "SELECT k.id_kunjungan, p.nama_lengkap, k.status_antrean, k.keluhan FROM kunjungan k JOIN pasien p ON k.id_pasien = p.id_pasien WHERE k.tanggal_kunjungan = CURDATE() ORDER BY k.id_kunjungan ASC");
+$daftar_antrean = mysqli_query($koneksi, "SELECT k.id_kunjungan, k.nomor_antrean, k.poli_tujuan, p.nama_lengkap, k.status_antrean, k.keluhan FROM kunjungan k JOIN pasien p ON k.id_pasien = p.id_pasien WHERE DATE(k.tanggal_kunjungan) = CURDATE() ORDER BY k.id_kunjungan ASC");
 
 // 👥 QUERY 2: BUKU REGISTRASI BESAR (Master Data Pasien + Search)
 if (!empty($search_keyword)) {
