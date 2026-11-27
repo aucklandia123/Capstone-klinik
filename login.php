@@ -125,7 +125,7 @@ if (isset($_POST['daftar_baru'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk ke Akun Pasien - Klinik Sehat Pratama</title>
+    <title>Masuk ke Akun Pasien - Praktek Mandiri drg. Azwari</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -585,7 +585,7 @@ if (isset($_POST['daftar_baru'])) {
                     </svg>
                 </div>
                 <div>
-                    <h1 class="brand-title">Klinik Sehat Pratama</h1>
+                    <h1 class="brand-title">Praktek Mandiri drg. Azwari</h1>
                     <p class="brand-subtitle">SISTEM INFORMASI PELAYANAN PASIEN</p>
                 </div>
             </div>
@@ -596,7 +596,7 @@ if (isset($_POST['daftar_baru'])) {
             </div>
 
             <div style="font-size: 11px; opacity: 0.7;">
-                &copy; <?php echo date('Y'); ?> Klinik Sehat Pratama. All rights reserved.
+                &copy; <?php echo date('Y'); ?> Praktek Mandiri drg. Azwari. All rights reserved.
             </div>
         </div>
 
@@ -610,7 +610,7 @@ if (isset($_POST['daftar_baru'])) {
             </div>
 
             <h2 class="login-heading">Masuk ke Akun Pasien</h2>
-            <p class="login-subtext">Silakan masukkan kredensial akun pasien yang terdaftar di Klinik Sehat Pratama.</p>
+            <p class="login-subtext">Silakan masukkan kredensial akun pasien yang terdaftar di Praktek Mandiri drg. Azwari.</p>
 
             <?php if (!empty($error)): ?>
                 <div class="alert-error"><?php echo $error; ?></div>
